@@ -22,4 +22,5 @@ major_version_zero = true
 [dependency-groups]
 test = [
     "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
 ]
