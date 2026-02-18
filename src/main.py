@@ -3,10 +3,17 @@ import asyncio
 from langchain.messages import HumanMessage
 
 from src.agent.graph import create_agent
+from src.agent.mcp_client import get_mcp_tools
 
 
 async def main():
-    agent = create_agent()
+
+    mcp_tools = await get_mcp_tools()
+
+    if mcp_tools:
+        print(f"MCP tools loaded: {[t.name for t in mcp_tools]}")
+
+    agent = create_agent(extra_tools=mcp_tools)
 
     print("Agent ready. Type 'quit' to exit.\n")
     while True:

@@ -1,4 +1,5 @@
 from langchain.messages import SystemMessage
+from langchain.tools import BaseTool
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 
@@ -16,10 +17,16 @@ def make_llm() -> ChatOpenAI:
     )
 
 
-llm_with_tools = make_llm().bind_tools(ALL_TOOLS)
+def get_assistant_node(extra_tools: list[BaseTool] | None = None):
 
+    if extra_tools is None:
+        extra_tools = []
 
-async def assistant_node(state: AgentState, config: RunnableConfig) -> dict:
-    messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
-    response = await llm_with_tools.ainvoke(messages, config=config)
-    return {"messages": [response]}
+    llm_with_tools = make_llm().bind_tools(ALL_TOOLS + extra_tools)
+
+    async def assistant_node(state: AgentState, config: RunnableConfig) -> dict:
+        messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
+        response = await llm_with_tools.ainvoke(messages, config=config)
+        return {"messages": [response]}
+
+    return assistant_node
